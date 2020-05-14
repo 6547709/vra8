@@ -35,6 +35,7 @@ then
   sudo systemctl restart cloud-config.service
   sudo systemctl restart cloud-final.service
   sudo systemctl disable runonce
+  sudo touch /etc/cloud/cloud-init.disabled
   sudo touch /tmp/cloud-init.success
 fi
 
