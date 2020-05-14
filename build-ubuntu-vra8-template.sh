@@ -9,6 +9,9 @@ sudo apt-get -y install cloud-init
 ###disable vmware customization for cloud-init. ###
 sudo sed -i 's/^disable_root: true/disable_root: false/g' /etc/cloud/cloud.cfg
 sudo sed -i '/^preserve_hostname: false/a\disable_vmware_customization: true' /etc/cloud/cloud.cfg
+###disable cloud-init config network. ###
+sudo sed -i '/^disable_vmware_customization: true/a\network:' /etc/cloud/cloud.cfg
+sudo sed -i '/^network:/a\  config: disabled' /etc/cloud/cloud.cfg
 ###setting datasouce is OVF only. ### 
 sudo sed -i '/^disable_vmware_customization: true/a\datasource_list: [OVF]' /etc/cloud/cloud.cfg
 ###disalbe clean tmp folder. ### 
@@ -31,7 +34,6 @@ then
   sudo systemctl restart cloud-config.service
   sudo systemctl restart cloud-final.service
   sudo systemctl disable runonce
-  sudo touch /etc/cloud/cloud-init.disabled
   sudo touch /tmp/cloud-init.success
 fi
 
