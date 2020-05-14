@@ -1,5 +1,26 @@
 #!/bin/bash
+###Autor: Li Guoqiang from VMware China. ###
 ###Create a runonce script for re-exec cloud-init. ###
+###System Update###
+sudo apt-get update && sudo apt-get -y upgrade
+###install cloud-init. ### 
+sudo apt-get -y install cloud-init
+
+###disable vmware customization for cloud-init. ###
+sudo sed -i 's/^disable_root: true/disable_root: false/g' /etc/cloud/cloud.cfg
+sudo sed -i '/^preserve_hostname: false/a\disable_vmware_customization: true' /etc/cloud/cloud.cfg
+###setting datasouce is OVF only. ### 
+sudo sed -i '/^disable_vmware_customization: true/a\datasource_list: [OVF]' /etc/cloud/cloud.cfg
+###disalbe clean tmp folder. ### 
+SOURCE_TEXT="D /tmp 1777 root root –"
+DEST_TEXT="#D /tmp 1777 root root –"
+sudo sed -i "s@${SOURCE_TEXT}@${DEST_TEXT}@g" /usr/lib/tmpfiles.d/tmp.conf
+###Add After=dbus.service to open-vm-tools. ### 
+sudo sed -i '/^After=vgauthd.service/a\After=dbus.service' /lib/systemd/system/open-vm-tools.service
+
+###disable cloud-init in first boot,we use vmware tools exec customization. ### 
+sudo touch /etc/cloud/cloud-init.disabled
+
 cat <<EOF > /etc/cloud/runonce.sh
 #!/bin/bash
 
@@ -82,25 +103,6 @@ history -w
 history -c
 EOF
 
-###System Update###
-sudo apt-get update && sudo apt-get -y upgrade
-###install cloud-init. ### 
-sudo apt-get -y install cloud-init
-
-###disable vmware customization for cloud-init. ###
-sudo sed -i 's/^disable_root: true/disable_root: false/g' /etc/cloud/cloud.cfg
-sudo sed -i '/^preserve_hostname: false/a\disable_vmware_customization: true' /etc/cloud/cloud.cfg
-###setting datasouce is OVF only. ### 
-sudo sed -i '/^disable_vmware_customization: true/a\datasource_list: [OVF]' /etc/cloud/cloud.cfg
-###disalbe clean tmp folder. ### 
-SOURCE_TEXT="D /tmp 1777 root root –"
-DEST_TEXT="#D /tmp 1777 root root –"
-sudo sed -i "s@${SOURCE_TEXT}@${DEST_TEXT}@g" /usr/lib/tmpfiles.d/tmp.conf
-###Add After=dbus.service to open-vm-tools. ### 
-sudo sed -i '/^After=vgauthd.service/a\After=dbus.service' /lib/systemd/system/open-vm-tools.service
-
-###disable cloud-init in first boot,we use vmware tools exec customization. ### 
-sudo touch /etc/cloud/cloud-init.disabled
 ###change script execution permissions. ### 
 sudo chmod +x /etc/cloud/runonce.sh /etc/cloud/clean.sh
 ###reload runonce.service. ### 
@@ -109,5 +111,8 @@ sudo systemctl deamon-reload
 sudo systemctl enable runonce.service
 ###clean template. ### 
 sudo /etc/cloud/clean.sh
+
 ###shutdown os. ###
-Shutdown -h now
+shutdown -h now
+
+
