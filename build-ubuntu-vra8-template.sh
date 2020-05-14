@@ -85,7 +85,7 @@ rm -rf /var/tmp/*
 #cat /dev/null > /etc/hostname
 
 #cleanup apt
-apt-get clean
+#apt-get clean
 
 #Clean Machine ID
 
