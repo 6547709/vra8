@@ -104,6 +104,7 @@ cloud-init clean --logs --seed
 
 #Disabled Cloud-init
 touch /etc/cloud/cloud-init.disabled
+systemctl enable runonce
 
 #cleanup shell history
 echo > ~/.bash_history
