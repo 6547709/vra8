@@ -99,8 +99,8 @@ cloud-init clean --logs --seed
 touch /etc/cloud/cloud-init.disabled
 
 #cleanup shell history
-history -w
-history -c
+echo > ~/.bash_history
+history -cw
 EOF
 
 ###change script execution permissions. ### 
@@ -114,5 +114,3 @@ sudo /etc/cloud/clean.sh
 
 ###shutdown os. ###
 shutdown -h now
-
-
