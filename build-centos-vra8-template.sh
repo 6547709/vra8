@@ -6,17 +6,20 @@ yum install -y cloud-init
 yum update -y
 
 ###eanble root and password login for ssh. ###
-sudo sed -i 's/^disable_root: 1/disable_root: 0/g' /etc/cloud/cloud.cfg
-sudo sed -i 's/^ssh_pwauth:   0/ssh_pwauth:   1/g' /etc/cloud/cloud.cfg
+sed -i 's/^disable_root: 1/disable_root: 0/g' /etc/cloud/cloud.cfg
+sed -i 's/^ssh_pwauth:   0/ssh_pwauth:   1/g' /etc/cloud/cloud.cfg
 
 ###disable vmware customization for cloud-init. ###
 sed -i 's/^disable_vmware_customization: false/disable_vmware_customization: true/g' /etc/cloud/cloud.cfg
 ###setting datasouce is OVF only. ### 
 sed -i '/^disable_vmware_customization: true/a\datasource_list: [OVF]' /etc/cloud/cloud.cfg
+###disable cloud-init config network. ###
+sed -i '/^disable_vmware_customization: true/a\network:' /etc/cloud/cloud.cfg
+sed -i '/^network:/a\  config: disabled' /etc/cloud/cloud.cfg
 ###disalbe clean tmp folder. ### 
 SOURCE_TEXT="v /tmp 1777 root root 10d"
 DEST_TEXT="#v /tmp 1777 root root 10d"
-sudo sed -i "s@${SOURCE_TEXT}@${DEST_TEXT}@g" /usr/lib/tmpfiles.d/tmp.conf
+sed -i "s@${SOURCE_TEXT}@${DEST_TEXT}@g" /usr/lib/tmpfiles.d/tmp.conf
 sed -i "s/\(^.*10d.*$\)/#\1/" /usr/lib/tmpfiles.d/tmp.conf
 ###Add After=dbus.service to vmtoolsd. ### 
 sed -i '/^After=vgauthd.service/a\After=dbus.service' /usr/lib/systemd/system/vmtoolsd.service
@@ -35,7 +38,6 @@ then
   sudo systemctl restart cloud-config.service
   sudo systemctl restart cloud-final.service
   sudo systemctl disable runonce
-  sudo touch /etc/cloud/cloud-init.disabled
   sudo touch /tmp/cloud-init.success
 fi
 
@@ -116,6 +118,6 @@ systemctl enable runonce.service
 ###clean template. ### 
 /etc/cloud/clean.sh
 ###shutdown os. ###
-Shutdown -h now
+shutdown -h now
 
 
