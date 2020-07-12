@@ -113,7 +113,7 @@ EOF
 ###change script execution permissions. ### 
 chmod +x /etc/cloud/runonce.sh /etc/cloud/clean.sh
 ###reload runonce.service. ### 
-systemctl deamon-reload
+systemctl daemon-reload
 ###enable runonce.service on system boot. ### 
 systemctl enable runonce.service
 ###clean template. ### 
